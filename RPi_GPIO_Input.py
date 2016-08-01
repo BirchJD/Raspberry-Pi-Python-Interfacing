@@ -1,5 +1,10 @@
 #!/usr/bin/python
 
+#/**********************************************/
+#/* Raspberry Pi GPIO Input Example in Python. */
+#/* 2016-07-31 - Version 1.00 - Jason Birch.   */
+#/**********************************************/
+
 import sys
 import time
 import datetime
