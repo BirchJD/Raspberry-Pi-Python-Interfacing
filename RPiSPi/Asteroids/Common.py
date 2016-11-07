@@ -145,6 +145,7 @@ def InitSPI():
    WriteGPIO("/dev/RPiSPi_011_001_4_7_MCP23S17_INTCON", 0x0000)
    WriteGPIO("/dev/RPiSPi_011_001_4_8_MCP23S17_GPPU", 0xF00F)
    
+   WriteGPIO("/dev/RPiSPi_010_000_2_0_SSD1306_INIT", SPI_DEV_CMD_MCP23S17_INIT)
    SPiDisplayFile = open("/dev/RPiSPi_010_000_2_1_SSD1306_WRITE", 'wb', 0)
 
    DoDisplay(SPI_DEV_CMD_SSD1306_ON)

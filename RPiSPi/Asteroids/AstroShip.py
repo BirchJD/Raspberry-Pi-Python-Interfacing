@@ -166,13 +166,13 @@ class AstroShip:
 #  /*****************************************/
 # /* Add thrust point if currently active. */
 #/*****************************************/
-               if self.ThrustFlag == True:
-                  for self.Count in range(self.THRUST_POINTS):
-                     self.ThrustTrail[self.Count].x = self.xOffset + random.randrange(5) - 2 + (9 * math.sin(self.FrameStep * self.Angle + self.OneDegree * 180))
-                     self.ThrustTrail[self.Count].y = self.yOffset + random.randrange(5) - 2 + (9 * math.cos(self.FrameStep * self.Angle + self.OneDegree * 180))
-                     Common.DrawLine(self.ThrustTrail[self.Count].x, self.ThrustTrail[self.Count].y, self.ThrustTrail[self.Count].x + 1, self.ThrustTrail[self.Count].y + 1, 1)
+            if self.ThrustFlag == True:
+               for self.Count in range(self.THRUST_POINTS):
+                  self.ThrustTrail[self.Count].x = self.xOffset + random.randrange(5) - 2 + (9 * math.sin(self.FrameStep * self.Angle + self.OneDegree * 180))
+                  self.ThrustTrail[self.Count].y = self.yOffset + random.randrange(5) - 2 + (9 * math.cos(self.FrameStep * self.Angle + self.OneDegree * 180))
+                  Common.DrawLine(self.ThrustTrail[self.Count].x, self.ThrustTrail[self.Count].y, self.ThrustTrail[self.Count].x + 1, self.ThrustTrail[self.Count].y + 1, 1)
 
-               self.ThrustFlag = False
+            self.ThrustFlag = False
 
 #   /******************************************/
 #  /* Plot ships current position,           */
