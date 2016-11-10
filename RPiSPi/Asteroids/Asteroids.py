@@ -88,6 +88,8 @@ HiScore = Number.Number()
 GameOver = Text.Text()
 InsertCoin = Text.Text()
 
+BeltWav = pygame.mixer.Sound("Sounds/Belt.wav")
+
 #  /***************/
 # /* Game flags. */
 #/***************/
@@ -135,6 +137,8 @@ def Timer():
       if Rock[Count].GetSize() != AstroRock.AstroRock.INACTIVE:
          RockFound = True
 
+      Rock[Count].Move()
+
 #  /*****************************/
 # /* Check for ship collision. */
 #/*****************************/
@@ -162,9 +166,8 @@ def Timer():
                   NextRock += 1
                   Rock[NextRock].SetArea(Common.Desktop, Rock[Count].GetXOffset(), Rock[Count].GetYOffset(), Rock[Count].GetSize())
 
-      Rock[Count].Move()
-
    if RockFound == False:
+      BeltWav.play()
       FirstRock += 1
       NextRock = FirstRock
       for Count in range(FirstRock):

@@ -62,6 +62,18 @@ def DoDisplay(*Args):
    File.write(Message)
 
 
+def WriteGPIO(DevFile, *Args):
+   Message = ""
+   for Count in range(len(Args)):
+      if isinstance(Args[Count], str):
+         Message += Args[Count]
+      else:
+         Message += struct.pack('I', Args[Count])
+   File = open(DevFile, 'wb', 0)
+   File.write(Message)
+   File.close()
+
+
 
 #  /*********************************************************/
 # /* Configure the console so key presses can be captured. */
@@ -72,6 +84,7 @@ window = curses.newwin(80, 25)
 window.nodelay(1)
 window.timeout(0)
 
+WriteGPIO("/dev/RPiSPi_010_000_2_0_SSD1306_INIT", SPI_DEV_CMD_SSD1306_INIT)
 File = open("/dev/RPiSPi_010_000_2_1_SSD1306_WRITE", 'wb', 0)
 
 DoDisplay(SPI_DEV_CMD_SSD1306_ON)
