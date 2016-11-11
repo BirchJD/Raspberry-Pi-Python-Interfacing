@@ -135,8 +135,8 @@ class AstroRock:
       self.xVelocity = 0
       self.yVelocity = 0
       while self.xVelocity == 0 or self.yVelocity == 0:
-         self.xVelocity = random.randrange(2 * (self.Size + 1)) - 1 * (self.Size + 1)
-         self.yVelocity = random.randrange(2 * (self.Size + 1)) - 1 * (self.Size + 1)
+         self.xVelocity = random.randrange(3 * (self.Size + 1)) - 1 * (self.Size + 1)
+         self.yVelocity = random.randrange(3 * (self.Size + 1)) - 1 * (self.Size + 1)
 
 
 
@@ -152,8 +152,8 @@ class AstroRock:
             self.xVelocity = 0
             self.yVelocity = 0
             while self.xVelocity == 0 or self.yVelocity == 0:
-               self.xVelocity = random.randrange(6 * (self.Size + 1)) - 3 * (self.Size + 1)
-               self.yVelocity = random.randrange(6 * (self.Size + 1)) - 3 * (self.Size + 1)
+               self.xVelocity = random.randrange(7 * (self.Size + 1)) - 3 * (self.Size + 1)
+               self.yVelocity = random.randrange(7 * (self.Size + 1)) - 3 * (self.Size + 1)
 
       return  self.Collision
 
