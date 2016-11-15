@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 
-# RPiSPi_MCP23S17 - Python Example For RPiSPi Driver For MCP23S17 GPIO Expander
+# RPiSPi_SSD1306 - Python Example For RPiSPi Driver Using SSD1306 Display
 # Copyright (C) 2016 Jason Birch
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,48 +17,50 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #/****************************************************************************/
-#/* RPiSPi_MCP23S17                                                          */
+#/* RPiSPi_SSD1306                                                           */
 #/* ------------------------------------------------------------------------ */
 #/* V1.00 - 2016-11-02 - Jason Birch                                         */
 #/* ------------------------------------------------------------------------ */
-#/* Python Example For RPiSPi Driver Using MCP23S17 GPIO Expander.           */
+#/* Python Example For RPiSPi Driver Using SSD1306 Display.                  */
 #/****************************************************************************/
 
 
-import sys
 import time
 import datetime
+import socket
 import curses
 import struct
 
 
-SPI_DEV_CMD_MCP23S17_INIT         = 0
-SPI_DEV_CMD_MCP23S17_WRITE        = 1
-SPI_DEV_CMD_MCP23S17_READ         = 2
-# IODIR - I/O DIRECTION REGISTER - 0=OUTPUT, 1=INPUT
-SPI_DEV_CMD_MCP23S17_IODIR        = 3
-# IPOL - INPUT POLARITY PORT REGISTER
-SPI_DEV_CMD_MCP23S17_IPOL         = 4
-# GPINTEN - INTERRUPT-ON-CHANGE PINS
-SPI_DEV_CMD_MCP23S17_GPINTEN      = 5
-# DEFVAL - DEFAULT VALUE REGISTER
-SPI_DEV_CMD_MCP23S17_DEFVAL       = 6
-# INTCON - INTERRUPT-ON-CHANGE CONTROL REGISTER
-SPI_DEV_CMD_MCP23S17_INTCON       = 7
-# GPPU - GPIO PULL-UP RESISTOR REGISTER
-SPI_DEV_CMD_MCP23S17_GPPU         = 8
-# INTF - INTERRUPT FLAG REGISTER
-SPI_DEV_CMD_MCP23S17_INTF         = 9
-# INTCAP - INTERRUPT CAPTURED VALUE FOR PORT REGISTER
-SPI_DEV_CMD_MCP23S17_INTCAP       = 10
+SPI_DEV_CMD_SSD1306_INIT          = 0
+SPI_DEV_CMD_SSD1306_WRITE         = 1
+SPI_DEV_CMD_SSD1306_CURSOR_POS    = 2
+SPI_DEV_CMD_SSD1306_ON            = 3
+SPI_DEV_CMD_SSD1306_OFF           = 4
+SPI_DEV_CMD_SSD1306_INVERSE       = 5
+SPI_DEV_CMD_SSD1306_NON_INVERSE   = 6
+SPI_DEV_CMD_SSD1306_CONTRAST      = 7
+SPI_DEV_PRC_SSD1306_CLS           = 8
+SPI_DEV_PRC_SSD1306_FILL_RANDOM   = 9
+SPI_DEV_PRC_SSD1306_PRINT         = 10
+SPI_DEV_PRC_SSD1306_PLOT          = 11
+SPI_DEV_PRC_SSD1306_LINE          = 12
+SPI_DEV_PRC_SSD1306_BOX           = 13
+SPI_DEV_PRC_SSD1306_BOX_FILL      = 14
+SPI_DEV_PRC_SSD1306_CIRCLE        = 15
+SPI_DEV_PRC_SSD1306_CIRCLE_FILL   = 16
+SPI_DEV_PRC_SSD1306_UPDATE        = 17
 
 
 
-def ReadGPIO(DevFile):
-   File = open(DevFile, 'rb', 0)
-   Data = File.read(4)
-   File.close()
-   return struct.unpack("<%dI" % (len(Data) // 4), Data)[0]
+def DoDisplay(*Args):
+   Message = ""
+   for Count in range(len(Args)):
+      if isinstance(Args[Count], str):
+         Message += Args[Count]
+      else:
+         Message += struct.pack('I', Args[Count])
+   File.write(Message)
 
 
 def WriteGPIO(DevFile, *Args):
@@ -83,21 +85,16 @@ window = curses.newwin(80, 25)
 window.nodelay(1)
 window.timeout(0)
 
-WriteGPIO("/dev/RPiSPi_0011_000_4_3_MCP23S17_IODIR", 0xFF00)
-WriteGPIO("/dev/RPiSPi_0011_000_4_4_MCP23S17_IPOL", 0xFF00)
-WriteGPIO("/dev/RPiSPi_0011_000_4_5_MCP23S17_GPINTEN", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_000_4_6_MCP23S17_DEFVAL", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_000_4_7_MCP23S17_INTCON", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_000_4_8_MCP23S17_GPPU", 0xFF00)
+WriteGPIO("/dev/RPiSPi_1000_000_3_0_SSD1306_INIT", SPI_DEV_CMD_SSD1306_INIT)
+File = open("/dev/RPiSPi_1000_000_3_1_SSD1306_WRITE", 'wb', 0)
 
-WriteGPIO("/dev/RPiSPi_0011_001_5_3_MCP23S17_IODIR", 0xFFFF)
-WriteGPIO("/dev/RPiSPi_0011_001_5_4_MCP23S17_IPOL", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_001_5_5_MCP23S17_GPINTEN", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_001_5_6_MCP23S17_DEFVAL", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_001_5_7_MCP23S17_INTCON", 0x0000)
-WriteGPIO("/dev/RPiSPi_0011_001_5_8_MCP23S17_GPPU", 0xF00F)
+DoDisplay(SPI_DEV_CMD_SSD1306_ON)
+DoDisplay(SPI_DEV_CMD_SSD1306_CONTRAST, 127)
+DoDisplay(SPI_DEV_PRC_SSD1306_CLS)
 
-OutValue = 0;
+ThisSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+ThisSocket.connect(('192.168.0.1', 0))
+
 ExitFlag = False
 while ExitFlag == False:
 #  /**********************************************/
@@ -116,18 +113,21 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   OutValue /= 2
-   if OutValue == 0:
-      OutValue = 0x80;
-
-   WriteGPIO("/dev/RPiSPi_0011_000_4_1_MCP23S17_WRITE", (~OutValue) & 0xFF)
-
    Now = datetime.datetime.now()
-   Value0 = ReadGPIO("/dev/RPiSPi_0011_000_4_2_MCP23S17_READ")
-   Value1 = ReadGPIO("/dev/RPiSPi_0011_001_5_2_MCP23S17_READ")
-   print(Now.strftime("%Y-%m-%d %H:%M:%S") + "   GPIO0:  " + format(Value0, '016b') + " - GPIO1:  " + format(Value1, '016b') + "\r")
+   if Now.microsecond > 500000:
+      DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 18, 0, 2, 3, Now.strftime("%H %M %S"))
+   else:
+      DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 18, 0, 2, 3, Now.strftime("%H:%M:%S"))
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 5, 28, 2, 2, Now.strftime("%Y-%m-%d"))
+
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 64 - len(ThisSocket.getsockname()[0]) * 6 / 2, 48, 1, 2, ThisSocket.getsockname()[0])
+
+   DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
 
 
+DoDisplay(SPI_DEV_CMD_SSD1306_OFF)
+
+File.close()
 
 #  /*********************/
 # /* Exit application. */

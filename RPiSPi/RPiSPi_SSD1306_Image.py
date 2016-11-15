@@ -25,10 +25,9 @@
 #/****************************************************************************/
 
 
-import time
-import datetime
 import curses
 import struct
+import pygame
 
 
 SPI_DEV_CMD_SSD1306_INIT          = 0
@@ -74,6 +73,21 @@ def WriteGPIO(DevFile, *Args):
    File.close()
 
 
+def DisplayImage128x64(ImageSurface):
+   LastColourValue = 0
+   for XPos in range(128):
+      for YPos in range(64):
+         ColourValue = sum(ImageSurface.get_at((XPos, YPos))) / 3;
+         Colour = 0
+         if ColourValue > 240:
+            Colour = 1
+         elif ColourValue > 32 and abs(LastColourValue - ColourValue) > 16:
+            Colour = 1
+         LastColourValue = ColourValue
+
+         DoDisplay(SPI_DEV_PRC_SSD1306_PLOT, XPos, YPos, Colour)
+
+
 
 #  /*********************************************************/
 # /* Configure the console so key presses can be captured. */
@@ -84,33 +98,20 @@ window = curses.newwin(80, 25)
 window.nodelay(1)
 window.timeout(0)
 
+pygame.init()
+ThisImage1 = pygame.image.load("TestImage1.gif")
+ThisImage2 = pygame.image.load("TestImage2.gif")
+
 WriteGPIO("/dev/RPiSPi_0010_000_2_0_SSD1306_INIT", SPI_DEV_CMD_SSD1306_INIT)
 File = open("/dev/RPiSPi_0010_000_2_1_SSD1306_WRITE", 'wb', 0)
 
 DoDisplay(SPI_DEV_CMD_SSD1306_ON)
 DoDisplay(SPI_DEV_CMD_SSD1306_CONTRAST, 127)
-DoDisplay(SPI_DEV_PRC_SSD1306_FILL_RANDOM)
-time.sleep(1)
-DoDisplay(SPI_DEV_CMD_SSD1306_INVERSE)
-time.sleep(1)
-DoDisplay(SPI_DEV_CMD_SSD1306_NON_INVERSE)
 DoDisplay(SPI_DEV_PRC_SSD1306_CLS)
 
-DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 0, 20, 1, 1, "Size 1")
-DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 0, 47, 3, 3, "Size 3")
-DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 0, 30, 2, 2, "Size 2")
 
-DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 12, 15, 30, 24, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 30, 24, 12, 35, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 12, 35, 5, 24, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 5, 24, 12, 15, 1)
-
-DoDisplay(SPI_DEV_PRC_SSD1306_PLOT, 42, 22, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_BOX, 60, 20, 80, 40, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_BOX_FILL, 65, 25, 75, 35, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_CIRCLE, 105, 25, 15, 1)
-DoDisplay(SPI_DEV_PRC_SSD1306_CIRCLE_FILL, 105, 25, 10, 1)
-
+ImageDelay = 0
+ImageDisplay = 1
 ExitFlag = False
 while ExitFlag == False:
 #  /**********************************************/
@@ -129,10 +130,17 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   Now = datetime.datetime.now()
-   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 8, 5, 1, 1, Now.strftime("%Y-%m-%d %H:%M:%S"))
-
-   DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
+   ImageDelay -= 1
+   if ImageDelay < 0:
+      ImageDelay = 10
+      if ImageDisplay == 1:
+         DisplayImage128x64(ThisImage1)
+         DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
+         ImageDisplay = 2
+      elif ImageDisplay == 2:
+         DisplayImage128x64(ThisImage2)
+         DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
+         ImageDisplay = 1
 
 
 DoDisplay(SPI_DEV_CMD_SSD1306_OFF)
