@@ -40,8 +40,11 @@ import pygame
 # /* Define constants. */
 #/*********************/
 # PLOT_HOURS = 0.05
-PLOT_HOURS = 1.0
-# PLOT_HOURS = 24.0
+# PLOT_HOURS = 0.25
+PLOT_HOURS = 24.0
+
+PLOT_CELCIUS = 30.0
+# PLOT_CELCIUS = 100.0
 
 AD_REF_VOLTAGE = 3.3
 AD_RESOLUTION = 1024.0
@@ -181,14 +184,14 @@ def Timer():
 #  /***************************************************/
 # /* Draw A-D channel 0, MCP9701A temprature sensor. */
 #/***************************************************/
-   Y0[X] = ((GRAPH_LEFT + X, GRAPH_TOP + GRAPH_HEIGHT - Value0C / 100.0 * GRAPH_HEIGHT))
+   Y0[X] = ((GRAPH_LEFT + X, GRAPH_TOP + GRAPH_HEIGHT - Value0C / PLOT_CELCIUS * GRAPH_HEIGHT))
    pygame.draw.lines(ThisSurface, MCP9701A_TEMPRATURE_COLOUR, False, Y0, 1)
 
 #  /****************************************/
 # /* Draw A-D channel 1, 100K Thermister. */
 #/****************************************/
-   Y1[X] = ((GRAPH_LEFT + X, GRAPH_TOP + GRAPH_HEIGHT - Value1C / 100.0 * GRAPH_HEIGHT))
-   Y1Adjusted[X] = ((GRAPH_LEFT + X, GRAPH_TOP + GRAPH_HEIGHT - Value1CAdjusted / 100.0 * GRAPH_HEIGHT))
+   Y1[X] = ((GRAPH_LEFT + X, GRAPH_TOP + GRAPH_HEIGHT - Value1C / PLOT_CELCIUS * GRAPH_HEIGHT))
+   Y1Adjusted[X] = ((GRAPH_LEFT + X, GRAPH_TOP + GRAPH_HEIGHT - Value1CAdjusted / PLOT_CELCIUS * GRAPH_HEIGHT))
    pygame.draw.lines(ThisSurface, THERMISTOR_TEMPRATURE_COLOUR, False, Y1, 1)
    pygame.draw.lines(ThisSurface, THERMISTOR_TEMPRATURE_COLOUR_ADJ, False, Y1Adjusted, 1)
 
@@ -237,18 +240,21 @@ def Timer():
 #  /*****************/
 # /* Draw Y scale. */
 #/*****************/
-   for Count in range(0, 110, 10):
-      Ypos = GRAPH_TOP + GRAPH_HEIGHT - Count / 100.0 * GRAPH_HEIGHT
+   XStep = PLOT_CELCIUS / 10.0
+   Count = 0.0
+   while Count <= PLOT_CELCIUS + PLOT_CELCIUS / 10.0:
+      Ypos = GRAPH_TOP + GRAPH_HEIGHT - Count / PLOT_CELCIUS * GRAPH_HEIGHT
       pygame.draw.line(ThisSurface, GREY_COLOUR, (GRAPH_LEFT - 5, Ypos), (GRAPH_LEFT, Ypos), 1)
-      FontText = SmallFont.render("{0:3}".format(Count), True, GREY_COLOUR)
+      FontText = SmallFont.render("{0:3.3}".format(Count), True, GREY_COLOUR)
       ThisSurface.blit(FontText, (5, Ypos - 10))
+      Count += XStep
 
 #  /*****************/
 # /* Draw X scale. */
 #/*****************/
    XStep = PLOT_HOURS / 6.0
    Count = 0.0
-   while Count <= PLOT_HOURS:
+   while Count <= PLOT_HOURS + PLOT_HOURS / 6.0:
       Xpos = GRAPH_LEFT + Count * GRAPH_WIDTH / PLOT_HOURS
       pygame.draw.line(ThisSurface, GREY_COLOUR, (Xpos, GRAPH_TOP + GRAPH_HEIGHT), (Xpos, GRAPH_TOP + GRAPH_HEIGHT + 5), 1)
       FontText = SmallFont.render("{0:3.3}".format(Count), True, GREY_COLOUR)
