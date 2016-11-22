@@ -39,12 +39,12 @@ import pygame
 #  /*********************/
 # /* Define constants. */
 #/*********************/
-# PLOT_HOURS = 0.05
+PLOT_HOURS = 0.05
 # PLOT_HOURS = 0.25
-PLOT_HOURS = 24.0
+# PLOT_HOURS = 24.0
 
-PLOT_CELCIUS = 30.0
-# PLOT_CELCIUS = 100.0
+# PLOT_CELCIUS = 30.0
+PLOT_CELCIUS = 100.0
 
 AD_REF_VOLTAGE = 3.3
 AD_RESOLUTION = 1024.0
@@ -245,7 +245,7 @@ def Timer():
    while Count <= PLOT_CELCIUS + PLOT_CELCIUS / 10.0:
       Ypos = GRAPH_TOP + GRAPH_HEIGHT - Count / PLOT_CELCIUS * GRAPH_HEIGHT
       pygame.draw.line(ThisSurface, GREY_COLOUR, (GRAPH_LEFT - 5, Ypos), (GRAPH_LEFT, Ypos), 1)
-      FontText = SmallFont.render("{0:3.3}".format(Count), True, GREY_COLOUR)
+      FontText = SmallFont.render("{0:3.4}".format(Count), True, GREY_COLOUR)
       ThisSurface.blit(FontText, (5, Ypos - 10))
       Count += XStep
 
