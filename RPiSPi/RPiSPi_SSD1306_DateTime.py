@@ -32,6 +32,9 @@ import curses
 import struct
 
 
+SSD1306_INIT                      = "/dev/RPiSPi_00010_000_2_0_SSD1306_INIT"
+SSD1306_WRITE                     = "/dev/RPiSPi_00010_000_2_1_SSD1306_WRITE"
+
 SPI_DEV_CMD_SSD1306_INIT          = 0
 SPI_DEV_CMD_SSD1306_WRITE         = 1
 SPI_DEV_CMD_SSD1306_CURSOR_POS    = 2
@@ -85,8 +88,8 @@ window = curses.newwin(80, 25)
 window.nodelay(1)
 window.timeout(0)
 
-WriteGPIO("/dev/RPiSPi_1000_000_3_0_SSD1306_INIT", SPI_DEV_CMD_SSD1306_INIT)
-File = open("/dev/RPiSPi_1000_000_3_1_SSD1306_WRITE", 'wb', 0)
+WriteGPIO(SSD1306_INIT, SPI_DEV_CMD_SSD1306_INIT)
+File = open(SSD1306_WRITE, 'wb', 0)
 
 DoDisplay(SPI_DEV_CMD_SSD1306_ON)
 DoDisplay(SPI_DEV_CMD_SSD1306_CONTRAST, 127)

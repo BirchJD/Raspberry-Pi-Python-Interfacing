@@ -1,6 +1,6 @@
 #!/usr/bin/python2
 
-# RPiSPi_SSD1306 - Python Example For RPiSPi Driver Using SSD1306 Display
+# RPiSPi_SSD1306_AnalogClock - Python Example For RPiSPi Driver Using SSD1306
 # Copyright (C) 2016 Jason Birch
 #
 # This program is free software: you can redistribute it and/or modify
@@ -17,21 +17,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #/****************************************************************************/
-#/* RPiSPi_SSD1306                                                           */
+#/* RPiSPi_SSD1306_AnalogClock                                               */
 #/* ------------------------------------------------------------------------ */
-#/* V1.00 - 2016-11-02 - Jason Birch                                         */
+#/* V1.00 - 2016-12-20 - Jason Birch                                         */
 #/* ------------------------------------------------------------------------ */
 #/* Python Example For RPiSPi Driver Using SSD1306 Display.                  */
 #/****************************************************************************/
 
 
+import time
+import math
+import datetime
 import curses
 import struct
-import pygame
 
 
-SSD1306_INIT                      = "/dev/RPiSPi_10000_000_5_0_SSD1306_INIT"
-SSD1306_WRITE                     = "/dev/RPiSPi_10000_000_5_1_SSD1306_WRITE"
+SSD1306_INIT                      = "/dev/RPiSPi_10010_000_7_0_SSD1306_INIT"
+SSD1306_WRITE                     = "/dev/RPiSPi_10010_000_7_1_SSD1306_WRITE"
 
 SPI_DEV_CMD_SSD1306_INIT          = 0
 SPI_DEV_CMD_SSD1306_WRITE         = 1
@@ -76,21 +78,6 @@ def WriteGPIO(DevFile, *Args):
    File.close()
 
 
-def DisplayImage128x64(ImageSurface):
-   LastColourValue = 0
-   for XPos in range(128):
-      for YPos in range(64):
-         ColourValue = sum(ImageSurface.get_at((XPos, YPos))) / 3;
-         Colour = 0
-         if ColourValue > 240:
-            Colour = 1
-         elif ColourValue > 32 and abs(LastColourValue - ColourValue) > 16:
-            Colour = 1
-         LastColourValue = ColourValue
-
-         DoDisplay(SPI_DEV_PRC_SSD1306_PLOT, XPos, YPos, Colour)
-
-
 
 #  /*********************************************************/
 # /* Configure the console so key presses can be captured. */
@@ -101,10 +88,6 @@ window = curses.newwin(80, 25)
 window.nodelay(1)
 window.timeout(0)
 
-pygame.init()
-ThisImage1 = pygame.image.load("TestImage1.gif")
-ThisImage2 = pygame.image.load("TestImage2.gif")
-
 WriteGPIO(SSD1306_INIT, SPI_DEV_CMD_SSD1306_INIT)
 File = open(SSD1306_WRITE, 'wb', 0)
 
@@ -112,9 +95,10 @@ DoDisplay(SPI_DEV_CMD_SSD1306_ON)
 DoDisplay(SPI_DEV_CMD_SSD1306_CONTRAST, 127)
 DoDisplay(SPI_DEV_PRC_SSD1306_CLS)
 
-
-ImageDelay = 0
-ImageDisplay = 1
+LastHour = 0
+LastMinute = 0
+LastSecond = 0
+LastMicrosecond = 0
 ExitFlag = False
 while ExitFlag == False:
 #  /**********************************************/
@@ -133,17 +117,54 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   ImageDelay -= 1
-   if ImageDelay < 0:
-      ImageDelay = 10
-      if ImageDisplay == 1:
-         DisplayImage128x64(ThisImage1)
-         DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
-         ImageDisplay = 2
-      elif ImageDisplay == 2:
-         DisplayImage128x64(ThisImage2)
-         DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
-         ImageDisplay = 1
+#  /******************************/
+# /* Get current time and date. */
+#/******************************/
+   Now = datetime.datetime.now()
+
+#  /********************/
+# /* Erase last time. */
+#/********************/
+   DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 32, 32, 32 + math.cos((2 * 3.142 * (LastHour + LastMinute / 60.0) / 12) - 3.142 / 2) * 18, 32 + math.sin((2 * 3.142 * (LastHour + LastMinute / 60.0) / 12) - 3.142 / 2) * 18, 0)
+   DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 32, 32, 32 + math.cos((2 * 3.142 * (LastMinute + LastSecond / 60.0) / 60) - 3.142 / 2) * 27, 32 + math.sin((2 * 3.142 * (LastMinute + LastSecond / 60.0) / 60) - 3.142 / 2) * 27, 0)
+   DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 32, 32, 32 + math.cos((2 * 3.142 * (LastSecond + LastMicrosecond / 1000000.0) / 60) - 3.142 / 2) * 30, 32 + math.sin((2 * 3.142 * (LastSecond + LastMicrosecond / 1000000.0) / 60) - 3.142 / 2) * 30, 0)
+
+#  /**************************/
+# /* Remember current time. */
+#/**************************/
+   LastHour = Now.hour
+   LastMinute = Now.minute
+   LastSecond = Now.second
+   LastMicrosecond = Now.microsecond
+
+#  /*************************/
+# /* Display current time. */
+#/*************************/
+   DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 32, 32, 32 + math.cos((2 * 3.142 * (LastHour + LastMinute / 60.0) / 12) - 3.142 / 2) * 18, 32 + math.sin((2 * 3.142 * (LastHour + LastMinute / 60.0) / 12) - 3.142 / 2) * 18, 1)
+   DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 32, 32, 32 + math.cos((2 * 3.142 * (LastMinute + LastSecond / 60.0) / 60) - 3.142 / 2) * 27, 32 + math.sin((2 * 3.142 * (LastMinute + LastSecond / 60.0) / 60) - 3.142 / 2) * 27, 1)
+   DoDisplay(SPI_DEV_PRC_SSD1306_LINE, 32, 32, 32 + math.cos((2 * 3.142 * (LastSecond + LastMicrosecond / 1000000.0) / 60) - 3.142 / 2) * 30, 32 + math.sin((2 * 3.142 * (LastSecond + LastMicrosecond / 1000000.0) / 60) - 3.142 / 2) * 30, 1)
+
+#  /*****************/
+# /* Display date. */
+#/*****************/
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 81, 6, 2, 1, Now.strftime("%a").upper())
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 87, 20, 2, 1, Now.strftime("%d"))
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 81, 35, 2, 1, Now.strftime("%b").upper())
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, 76, 50, 2, 1, Now.strftime("%Y"))
+
+#  /********************/
+# /* Display borders. */
+#/********************/
+   for Count in range(0, 60, 5):
+      DoDisplay(SPI_DEV_PRC_SSD1306_CIRCLE, 32 + math.cos(2 * 3.142 * Count / 60) * 25, 32 + math.sin(2 * 3.142 * Count / 60) * 25, 2, 1)
+
+   DoDisplay(SPI_DEV_PRC_SSD1306_CIRCLE, 32, 32, 31, 1)
+   DoDisplay(SPI_DEV_PRC_SSD1306_BOX, 70, 0, 127, 63, 1)
+
+#  /*******************/
+# /* Update display. */
+#/*******************/
+   DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
 
 
 DoDisplay(SPI_DEV_CMD_SSD1306_OFF)

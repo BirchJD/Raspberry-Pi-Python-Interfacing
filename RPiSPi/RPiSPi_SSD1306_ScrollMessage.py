@@ -25,13 +25,14 @@
 #/****************************************************************************/
 
 
+import time
+import datetime
 import curses
 import struct
-import pygame
 
 
-SSD1306_INIT                      = "/dev/RPiSPi_10000_000_5_0_SSD1306_INIT"
-SSD1306_WRITE                     = "/dev/RPiSPi_10000_000_5_1_SSD1306_WRITE"
+SSD1306_INIT                      = "/dev/RPiSPi_10001_000_6_0_SSD1306_INIT"
+SSD1306_WRITE                     = "/dev/RPiSPi_10001_000_6_1_SSD1306_WRITE"
 
 SPI_DEV_CMD_SSD1306_INIT          = 0
 SPI_DEV_CMD_SSD1306_WRITE         = 1
@@ -76,20 +77,11 @@ def WriteGPIO(DevFile, *Args):
    File.close()
 
 
-def DisplayImage128x64(ImageSurface):
-   LastColourValue = 0
-   for XPos in range(128):
-      for YPos in range(64):
-         ColourValue = sum(ImageSurface.get_at((XPos, YPos))) / 3;
-         Colour = 0
-         if ColourValue > 240:
-            Colour = 1
-         elif ColourValue > 32 and abs(LastColourValue - ColourValue) > 16:
-            Colour = 1
-         LastColourValue = ColourValue
-
-         DoDisplay(SPI_DEV_PRC_SSD1306_PLOT, XPos, YPos, Colour)
-
+def ScrollMessage(XPos, YPos, XSize, YSize, Message):
+   DoDisplay(SPI_DEV_PRC_SSD1306_BOX_FILL, 0, YPos, XSize * 6, YPos + YSize * 8, 0)
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, XPos, YPos, XSize, YSize, Message)
+   WrapMessage = Message[int(((len(Message) + 1) * 6 * XSize - XPos) / (XSize * 6)):]
+   DoDisplay(SPI_DEV_PRC_SSD1306_PRINT, (XPos - 1) % (XSize * 6), YPos, XSize, YSize, WrapMessage)
 
 
 #  /*********************************************************/
@@ -101,10 +93,6 @@ window = curses.newwin(80, 25)
 window.nodelay(1)
 window.timeout(0)
 
-pygame.init()
-ThisImage1 = pygame.image.load("TestImage1.gif")
-ThisImage2 = pygame.image.load("TestImage2.gif")
-
 WriteGPIO(SSD1306_INIT, SPI_DEV_CMD_SSD1306_INIT)
 File = open(SSD1306_WRITE, 'wb', 0)
 
@@ -112,15 +100,18 @@ DoDisplay(SPI_DEV_CMD_SSD1306_ON)
 DoDisplay(SPI_DEV_CMD_SSD1306_CONTRAST, 127)
 DoDisplay(SPI_DEV_PRC_SSD1306_CLS)
 
+Pos1 = 0
+Pos2 = 0
+Message2 = " <<<<< Scroll Message Left <<<<< "
+Pos3 = 0
+Message3 = " >>>>> Scroll Message Right >>>>> "
 
-ImageDelay = 0
-ImageDisplay = 1
 ExitFlag = False
 while ExitFlag == False:
 #  /**********************************************/
 # /* Process main application loop every 200ms. */
 #/**********************************************/
-   curses.napms(200)
+   curses.napms(100)
 
 #  /*************************/
 # /* Get a user key press. */
@@ -133,17 +124,27 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   ImageDelay -= 1
-   if ImageDelay < 0:
-      ImageDelay = 10
-      if ImageDisplay == 1:
-         DisplayImage128x64(ThisImage1)
-         DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
-         ImageDisplay = 2
-      elif ImageDisplay == 2:
-         DisplayImage128x64(ThisImage2)
-         DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
-         ImageDisplay = 1
+   Now = datetime.datetime.now()
+   Message1 = Now.strftime(" %Y-%m-%d %H:%M:%S ")
+
+   ScrollMessage(Pos1, 0, 1, 2, Message1)
+   ScrollMessage(Pos2, 25, 2, 2, Message2)
+   ScrollMessage(Pos3, 50, 2, 2, Message3)
+
+   DoDisplay(SPI_DEV_PRC_SSD1306_UPDATE)
+
+   Pos1 += 2
+   if Pos1 >= len(Message1) * 6 * 1:
+      Pos1 = 0
+
+   Pos2 -= 2
+   if Pos2 <= 0:
+      Pos2 = len(Message2) * 6 * 2
+
+   Pos3 += 2
+   if Pos3 >= len(Message3) * 6 * 2:
+      Pos3 = 0
+
 
 
 DoDisplay(SPI_DEV_CMD_SSD1306_OFF)

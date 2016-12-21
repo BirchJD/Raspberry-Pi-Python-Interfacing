@@ -32,6 +32,11 @@ import curses
 import struct
 
 
+MCP3002_READ0 = "/dev/RPiSPi_00000_000_0_2_MCP3002_READ0"
+MCP3002_READ1 = "/dev/RPiSPi_00000_000_0_3_MCP3002_READ1"
+
+
+
 def ReadAD(DevFile):
    File = open(DevFile, 'rb', 0)
    Data = File.read(4)
@@ -68,8 +73,8 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   Value0 = ReadAD("/dev/RPiSPi_0100_000_0_2_MCP3002_READ0")
-   Value1 = ReadAD("/dev/RPiSPi_0100_000_0_3_MCP3002_READ1")
+   Value0 = ReadAD(MCP3002_READ0)
+   Value1 = ReadAD(MCP3002_READ1)
 
    Now = datetime.datetime.now()
    print(Now.strftime("%Y-%m-%d %H:%M:%S") + "   A-D_[0]=" + str(Value0) + "   A-D_[1]=" + str(Value1) + "\r")

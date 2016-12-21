@@ -33,6 +33,10 @@ import curses
 import struct
 
 
+SPI_RAW_REG_RAW = "/dev/RPiSPi_00001_000_1_0_SPI_RAW_REG_RAW"
+
+
+
 def ReadRAW(DevFile):
    File = open(DevFile, 'rb', 0)
    Data = File.read(256 * 4)
@@ -81,36 +85,36 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0x80, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0x80, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value0 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0x90, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0x90, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value1 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0xA0, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0xA0, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value2 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0xB0, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0xB0, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value3 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0xC0, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0xC0, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value4 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0xD0, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0xD0, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value5 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0xE0, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0xE0, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value6 = 256 * (Values[1] & 0x03) + Values[2]
 
-   WriteRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW", 0x01, 0xF0, 0x00)
-   Values = ReadRAW("/dev/RPiSPi_0001_000_1_0_SPI_RAW_REG_RAW")
+   WriteRAW(SPI_RAW_REG_RAW, 0x01, 0xF0, 0x00)
+   Values = ReadRAW(SPI_RAW_REG_RAW)
    Value7 = 256 * (Values[1] & 0x03) + Values[2]
 
    Now = datetime.datetime.now()

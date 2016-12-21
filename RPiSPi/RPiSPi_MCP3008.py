@@ -32,6 +32,17 @@ import curses
 import struct
 
 
+MCP3008_READ0 = "/dev/RPiSPi_00000_000_0_2_MCP3008_READ0"
+MCP3008_READ1 = "/dev/RPiSPi_00000_000_0_3_MCP3008_READ1"
+MCP3008_READ2 = "/dev/RPiSPi_00000_000_0_4_MCP3008_READ2"
+MCP3008_READ3 = "/dev/RPiSPi_00000_000_0_5_MCP3008_READ3"
+MCP3008_READ4 = "/dev/RPiSPi_00000_000_0_6_MCP3008_READ4"
+MCP3008_READ5 = "/dev/RPiSPi_00000_000_0_7_MCP3008_READ5"
+MCP3008_READ6 = "/dev/RPiSPi_00000_000_0_8_MCP3008_READ6"
+MCP3008_READ7 = "/dev/RPiSPi_00000_000_0_9_MCP3008_READ7"
+
+
+
 def ReadAD(DevFile):
    File = open(DevFile, 'rb', 0)
    Data = File.read(4)
@@ -68,14 +79,14 @@ while ExitFlag == False:
    if ThisKey > -1:
       ExitFlag = True
 
-   Value0 = ReadAD("/dev/RPiSPi_0100_000_0_2_MCP3008_READ0")
-   Value1 = ReadAD("/dev/RPiSPi_0100_000_0_3_MCP3008_READ1")
-   Value2 = ReadAD("/dev/RPiSPi_0100_000_0_4_MCP3008_READ2")
-   Value3 = ReadAD("/dev/RPiSPi_0100_000_0_5_MCP3008_READ3")
-   Value4 = ReadAD("/dev/RPiSPi_0100_000_0_6_MCP3008_READ4")
-   Value5 = ReadAD("/dev/RPiSPi_0100_000_0_7_MCP3008_READ5")
-   Value6 = ReadAD("/dev/RPiSPi_0100_000_0_8_MCP3008_READ6")
-   Value7 = ReadAD("/dev/RPiSPi_0100_000_0_9_MCP3008_READ7")
+   Value0 = ReadAD(MCP3008_READ0)
+   Value1 = ReadAD(MCP3008_READ1)
+   Value2 = ReadAD(MCP3008_READ2)
+   Value3 = ReadAD(MCP3008_READ3)
+   Value4 = ReadAD(MCP3008_READ4)
+   Value5 = ReadAD(MCP3008_READ5)
+   Value6 = ReadAD(MCP3008_READ6)
+   Value7 = ReadAD(MCP3008_READ7)
 
    Now = datetime.datetime.now()
    print(Now.strftime("%Y-%m-%d %H:%M:%S") + "   A-D_[0]=" + str(Value0) + "   A-D_[1]=" + str(Value1) + "   A-D_[2]=" + str(Value2) + "   A-D_[3]=" + str(Value3) + "\r")
